@@ -266,6 +266,30 @@ class DataStorage(QtCore.QObject):
         #self.peak_hold_max_updated.emit({"x": self.x, "y": self.peak_hold_max})
         #self.peak_hold_min_updated.emit({"x": self.x, "y": self.peak_hold_min})
 
+    def get_history_snapshot(self):
+        """Return current x axis and history buffer (copy)"""
+        if self.x is None or self.history is None or self.history.history_size == 0:
+            return None, None
+        return self.x.copy(), self.history.get_buffer().copy()
+
+    def export_history(self, path):
+        """Export current history buffer to file (npz or csv)"""
+        self.wait()
+        x, history = self.get_history_snapshot()
+        if x is None or history is None:
+            return False
+
+        path = os.path.expanduser(path)
+        if path.lower().endswith(".csv"):
+            header = ",".join(
+                ["freq_hz"] + ["sweep_{:04d}".format(i) for i in range(history.shape[0])]
+            )
+            data = np.column_stack([x, history.T])
+            np.savetxt(path, data, delimiter=",", header=header, comments="")
+        else:
+            np.savez_compressed(path, x=x, history=history)
+        return True
+
 
 class Test:
     """Test data storage performance"""

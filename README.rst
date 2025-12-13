@@ -173,10 +173,21 @@ You can also install QSpectrumAnalyzer manually from `PyPI <https://pypi.python.
 You should then be able to run it with ``qspectrumanalyzer`` (or ``python -m qspectrumanalyzer``
 if it doesn't work for you).
 
+Exporting FFT history
+---------------------
+
+Use *File -> Export FFT history...* to save the current waterfall buffer to ``.npz`` (NumPy archive)
+or ``.csv`` for offline analysis.
+
+DragonOS
+--------
+
+QSpectrumAnalyzer is preinstalled in DragonOS, so you can launch it immediately without extra setup.
+Dependencies (PyQt6, pyqtgraph, SDR backends) are already bundled in the distro.
+
 Todo:
 -----
 
-- save FFT history (allow big waterfall plot saved to file)
 - automatic peak detection / highlighting
 - display average noise level
 - frequency markers / bookmarks with notes (even importing and exporting .csv file with

@@ -31,6 +31,7 @@ class QSpectrumAnalyzerMainWindow(QtWidgets.QMainWindow, Ui_QSpectrumAnalyzerMai
         # Initialize UI
         super().__init__(parent)
         self.setupUi(self)
+        self.add_menu_actions()
 
         # Set window icon
         icon_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "qspectrumanalyzer.svg")
@@ -62,6 +63,12 @@ class QSpectrumAnalyzerMainWindow(QtWidgets.QMainWindow, Ui_QSpectrumAnalyzerMai
 
         self.update_buttons()
         self.load_settings()
+
+    def add_menu_actions(self):
+        """Add extra File menu actions"""
+        self.action_ExportHistory = QtGui.QAction(self.tr("Export FFT history..."), self)
+        self.action_ExportHistory.triggered.connect(self.on_action_ExportHistory_triggered)
+        self.menu_File.insertAction(self.action_Quit, self.action_ExportHistory)
 
     def setup_power_thread(self):
         """Create power_thread and connect signals to slots"""
@@ -497,6 +504,22 @@ class QSpectrumAnalyzerMainWindow(QtWidgets.QMainWindow, Ui_QSpectrumAnalyzerMai
     def on_action_About_triggered(self):
         QtWidgets.QMessageBox.information(self, self.tr("About - QSpectrumAnalyzer"),
                                           self.tr("QSpectrumAnalyzer {}").format(__version__))
+
+    @QtCore.pyqtSlot()
+    def on_action_ExportHistory_triggered(self):
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            self.tr("Export FFT history"),
+            filter=self.tr("NumPy archive (*.npz);;CSV file (*.csv);;All files (*)")
+        )
+        if not path:
+            return
+
+        success = self.data_storage.export_history(path)
+        if success:
+            self.show_status(self.tr("History exported to {}").format(path), timeout=4000)
+        else:
+            self.show_status(self.tr("No data to export"), timeout=4000)
 
     @QtCore.pyqtSlot()
     def on_action_Quit_triggered(self):
